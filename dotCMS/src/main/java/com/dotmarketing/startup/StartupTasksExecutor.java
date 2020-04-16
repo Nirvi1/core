@@ -131,7 +131,6 @@ public class StartupTasksExecutor {
 		//Integer currentVersion = null;
 		PreparedStatement update = null;
 		Statement statement = null;
-		ResultSet resultSet = null;
 		Connection connection = null;
 
 		try {
@@ -139,15 +138,11 @@ public class StartupTasksExecutor {
 			connection = DbConnectionFactory.getDataSource().getConnection();
 			connection.setAutoCommit(false);
 			statement = connection.createStatement();
-
 			update = connection
 					.prepareStatement("INSERT INTO db_version (db_version,date_update) VALUES (?,?)");
-			statement.execute(lock);
-			resultSet = statement
-					.executeQuery(select);
-			resultSet.next();
-			Config.DB_VERSION = resultSet.getInt("db_version");
-		} catch (SQLException e) {
+            statement.execute(lock);
+            Config.DB_VERSION = getDBVersion(statement);
+        } catch (SQLException e) {
 			// Maybe the table doesn't exist?
 			Logger.debug(this.getClass(), "Trying to create db_version table");
 			try {
@@ -169,14 +164,10 @@ public class StartupTasksExecutor {
 				Logger
 						.debug(this.getClass(),
 								"Table db_version created.  Trying to lock db_table again.");
-				statement.execute(lock);
-				resultSet = statement
-						.executeQuery(select);
+                statement.execute(lock);
+                Config.DB_VERSION = getDBVersion(statement);
 
-				resultSet.next();
-				Config.DB_VERSION = resultSet.getInt("db_version");
-
-			} catch (SQLException e2) {
+            } catch (SQLException e2) {
 				Logger.fatal(this.getClass(),
 						"Locking of db_version table failed: "
 								+ e2.getMessage());
@@ -252,7 +243,7 @@ public class StartupTasksExecutor {
 				try {
 					int taskId = Integer.parseInt(id);
 					if (StartupTask.class.isAssignableFrom(c)
-							&& taskId > Config.DB_VERSION) {
+							&& taskId > getDBVersion(connection.createStatement())) {
 						StartupTask task;
 						try {
 							task = (StartupTask) c.newInstance();
@@ -297,6 +288,7 @@ public class StartupTasksExecutor {
 
 						Logger.info(this, "Database upgraded to version: "
 								+ taskId);
+
 						HibernateUtil.closeAndCommitTransaction();
 
 					}
@@ -316,8 +308,8 @@ public class StartupTasksExecutor {
 		} catch (Throwable e) {
 			HibernateUtil.rollbackTransaction();
       if(Config.getBooleanProperty("SYSTEM_EXIT_ON_STARTUP_FAILURE", true)){
-        e.printStackTrace();
-        System.exit(1);
+              e.printStackTrace();
+              System.exit(1);
       }
 			throw new DotDataException("Unable to execute startup task : ",e);
 		} finally {
@@ -351,6 +343,14 @@ public class StartupTasksExecutor {
 
 	}
 
+	private int getDBVersion(Statement statement) throws SQLException {
+        ResultSet resultSet;
+        resultSet = statement
+                .executeQuery(select);
+
+        resultSet.next();
+        return resultSet.getInt("db_version");
+    }
 
 
 }
