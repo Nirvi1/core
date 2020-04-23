@@ -993,7 +993,7 @@ class DeployWarTomcatTask extends DefaultTask{
 }
 
 task initNpm(type: NpmTask) {
-    args = ['init', '--yes']
+    args = ['init', '--yes', '--scripts-prepend-node-path']
 
     dependsOn 'installDotcmsUI', 'installDotcmsWebComponents'
     finalizedBy 'cleanNodeModules'
@@ -1001,16 +1001,16 @@ task initNpm(type: NpmTask) {
 
 task installDotcmsUI(type: NpmTask) {
     if ("latest".equals(coreWebReleaseVersion)) {
-        args = ['install', 'dotcms-ui']
+        args = ['install', 'dotcms-ui', '--scripts-prepend-node-path']
     }else{
-        args = ['install', 'dotcms-ui@' + coreWebReleaseVersion]
+        args = ['install', 'dotcms-ui@' + coreWebReleaseVersion, '--scripts-prepend-node-path']
     }
 
     finalizedBy 'copyDotcmsUI'
 }
 
 task installDotcmsWebComponents(type: NpmTask) {
-    args = ['install', 'dotcms-webcomponents']
+    args = ['install', 'dotcms-webcomponents', '--scripts-prepend-node-path']
     finalizedBy 'copyDotCMSWebComponents'
 }
 
