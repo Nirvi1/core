@@ -1093,7 +1093,7 @@ docker {
 docker.dependsOn createDist
 
 // upgrade task
-task upgradeTask << {
+upgradeTask {
     println "running the task: $task ";
 
     javaexec {
