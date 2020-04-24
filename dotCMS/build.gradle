@@ -33,7 +33,7 @@ node {
     // If true, it will download node using above parameters.
     // If false, it will try to use globally installed node.
 
-    workDir='/build/src/core/dotCMS/.gradle/nodejs/'
+    workDir =  file('/build/src/core/dotCMS/.gradle/nodejs/')
     download = true
 }
 
