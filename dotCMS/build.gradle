@@ -32,6 +32,13 @@ node {
     // If false, it will try to use globally installed node.
     download = true
 }
+
+npm_run_builder.dependsOn 'npmInstall'
+
+npm_install {
+    args = ['--loglevel', 'warn']
+}
+
 import com.dotcms.repackage.org.apache.commons.io.FileUtils;
 
 configurations {
@@ -993,7 +1000,7 @@ class DeployWarTomcatTask extends DefaultTask{
 }
 
 task initNpm(type: NpmTask) {
-    args = ['init', '--yes', '--scripts-prepend-node-path']
+    args = ['init', '--yes', '--scripts-prepend-node-path=true']
 
     dependsOn 'installDotcmsUI', 'installDotcmsWebComponents'
     finalizedBy 'cleanNodeModules'
@@ -1001,16 +1008,16 @@ task initNpm(type: NpmTask) {
 
 task installDotcmsUI(type: NpmTask) {
     if ("latest".equals(coreWebReleaseVersion)) {
-        args = ['install', 'dotcms-ui', '--scripts-prepend-node-path']
+        args = ['install', 'dotcms-ui', '--scripts-prepend-node-path=true']
     }else{
-        args = ['install', 'dotcms-ui@' + coreWebReleaseVersion, '--scripts-prepend-node-path']
+        args = ['install', 'dotcms-ui@' + coreWebReleaseVersion, '--scripts-prepend-node-path=true']
     }
 
     finalizedBy 'copyDotcmsUI'
 }
 
 task installDotcmsWebComponents(type: NpmTask) {
-    args = ['install', 'dotcms-webcomponents', '--scripts-prepend-node-path']
+    args = ['install', 'dotcms-webcomponents', '--scripts-prepend-node-path=true']
     finalizedBy 'copyDotCMSWebComponents'
 }
 
