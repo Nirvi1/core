@@ -1092,16 +1092,4 @@ docker {
 }
 docker.dependsOn createDist
 
-// upgrade task
-upgradeTask {
-    println "running the task: $task ";
-
-    javaexec {
-        main = "com.dotcms.upgrade.Upgrade"
-        classpath = files("../libs/plugins/plugin-com.dotcms.upgradetask.jar") + files(sourceSets.main.output.classesDir) +  files(sourceSets.main.output.resourcesDir) + files(configurations.compile.files)
-        args("$task")
-    }
-}
-
-
 
