@@ -26,6 +26,8 @@ node {
     // Version of node to use.
     version = nodeVersion
 
+    npmVersion = useNpmVersion
+
     // Base URL for fetching node distributions (change if you have a mirror).
     distBaseUrl = 'https://nodejs.org/dist'
     // If true, it will download node using above parameters.
@@ -38,6 +40,10 @@ npm_run_builder.dependsOn 'npmInstall'
 npm_install {
     args = ['--loglevel', 'warn']
 }
+
+nodeSetup.onlyIf = { true }
+
+npmSetup.onlyIf = { true }
 
 import com.dotcms.repackage.org.apache.commons.io.FileUtils;
 
